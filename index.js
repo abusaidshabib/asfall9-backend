@@ -33,6 +33,7 @@ async function run() {
       res.send(cars);
     });
 
+    //get cars data using email
     app.get('/carsdata/:id', async (req, res) => {
       const id = req.params.id;
       const query = { email: `${id}` };
@@ -41,6 +42,7 @@ async function run() {
     });
 
 
+    
     app.post('/carsdata', async (req, res) => {
       const data = req.body
       const cars = await carsCollection.insertOne(data);
