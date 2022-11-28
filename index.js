@@ -32,6 +32,15 @@ async function run() {
       const cars = await carsCollection.find(query).toArray();
       res.send(cars);
     });
+
+    app.get('/carsdata/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { email: `${id}` };
+      const cars =await carsCollection.find(query).toArray();
+      res.send(cars);
+    });
+
+
     app.post('/carsdata', async (req, res) => {
       const data = req.body
       const cars = await carsCollection.insertOne(data);
