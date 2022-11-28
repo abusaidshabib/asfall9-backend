@@ -37,12 +37,12 @@ async function run() {
     app.get('/carsdata/:id', async (req, res) => {
       const id = req.params.id;
       const query = { email: `${id}` };
-      const cars =await carsCollection.find(query).toArray();
+      const cars = await carsCollection.find(query).toArray();
       res.send(cars);
     });
 
 
-    
+
     app.post('/carsdata', async (req, res) => {
       const data = req.body
       const cars = await carsCollection.insertOne(data);
@@ -69,7 +69,7 @@ async function run() {
     //Get booking data
     app.get('/bookings/:email', async (req, res) => {
       const email = req.params.email;
-      const query = {email}
+      const query = { email }
       const user = await bookingsCollection.find(query).toArray();
       res.send(user);
     })
@@ -86,11 +86,21 @@ async function run() {
       const result = await userCollection.insertOne(user);
       res.send(result);
     })
+
     app.get('/user', async (req, res) => {
       const query = {};
       const user = await userCollection.find(query).toArray();
       res.send(user)
     })
+
+    //get user buyers or seller
+    app.get('/user/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { category: `${id}` };
+      const cursor = userCollection.find(query);
+      const user = await cursor.toArray();
+      res.send(user);
+    });
 
     //Orders
     app.get('/myorders/:id', async (req, res) => {
