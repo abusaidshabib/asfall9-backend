@@ -18,7 +18,6 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 function verifyJWT(req, res, next) {
-
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).send('unauthorized access');
@@ -44,6 +43,16 @@ async function run() {
     const bookingsCollection = client.db('asfall9').collection('bookings');
     const userCollection = client.db('asfall9').collection('user');
     const categorie = client.db('asfall9').collection('category');
+
+    const verifyAdmin = async(req, res, next ) =>{
+      const decodedEmail = req.decoded.email;
+      const query = {email: decodedEmail};
+      const user = await usersCollection.findOne(query);
+      if(user?.role !== 'admin'){
+        return res.status(403).send({message: 'forbidden access'})
+      }
+      next();
+    }
 
     app.get('/carsdata', async (req, res) => {
       let query = {};
@@ -87,9 +96,9 @@ async function run() {
       res.send(cars);
     });
 
-    app.delete('/carsdata/:id', async(req, res) => {
+    app.delete('/carsdata/:id', async (req, res) => {
       const id = req.params.id;
-      const filter = { _id: ObjectId(id)};
+      const filter = { _id: ObjectId(id) };
       const result = await carsCollection.deleteOne(filter);
       res.send(result)
     })
@@ -155,6 +164,13 @@ async function run() {
       const query = {};
       const user = await userCollection.find(query).toArray();
       res.send(user)
+    })
+
+    app.delete('/user/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await userCollection.deleteOne(filter);
+      res.send(result)
     })
 
     //get user buyers or seller
