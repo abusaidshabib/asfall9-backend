@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const { query } = require('express');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
@@ -35,6 +35,8 @@ function verifyJWT(req, res, next) {
   })
 
 }
+
+
 
 async function run() {
   try {
@@ -84,6 +86,13 @@ async function run() {
       const cars = await cursor.toArray();
       res.send(cars);
     });
+
+    app.delete('/carsdata/:id', async(req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id)};
+      const result = await carsCollection.deleteOne(filter);
+      res.send(result)
+    })
 
     // Categories
     app.get('/category', async (req, res) => {
