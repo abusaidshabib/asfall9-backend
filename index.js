@@ -55,41 +55,41 @@ async function run() {
       next();
     }
 
-    app.get('/carsdata', async (req, res) => {
-      let query = {};
-      if (req.query.category) {
-        query = { categories: req.query.category }
+    app.put('/carsdata/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) }
+      const options = { upsert: true };
+      const upData = {
+        $set: {
+          status : "available"
+        }
       }
-      const cars = await carsCollection.find(query).toArray();
-      res.send(cars);
-    });
+      const result = await carsCollection.updateOne(filter, upData, options);
+      res.send(result);
+    })
 
     //get cars data using email
     // app.get('/bookings', verifyJWT,  async (req, res) => {
     app.get('/carsdata', async (req, res) => {
       let query = {};
-      // console.log(req.query);
-      // const decodedEmail = req.decoded.email;
-      // if(email !== decodedEmail){
-      //   return res.status(403).send({message: 'forbidden access'})
-      // }
       if (req.query.email) {
-        query = { email: req.query.email }
-
+        query = { email: req.query.email };
       }
-      query = {}
+      if (req.query.category) {
+        query = { categories: req.query.category }
+      }
       const userData = await carsCollection.find(query).toArray();
       res.send(userData);
     })
 
-        // get product using category
-        app.get('/categories/:id', async (req, res) => {
-          const id = req.params.id;
-          const query = { status: `${id}` };
-          const cursor = carsCollection.find(query);
-          const cars = await cursor.toArray();
-          res.send(cars);
-        });
+    // get product using category
+    app.get('/status/available', async (req, res) => {
+      const id = req.params.available;
+      const query = { status: "available" };
+      const cursor = carsCollection.find(query);
+      const cars = await cursor.toArray();
+      res.send(cars);
+    });
 
 
     app.post('/carsdata', async (req, res) => {
