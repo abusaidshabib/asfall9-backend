@@ -44,13 +44,13 @@ async function run() {
     const userCollection = client.db('asfall9').collection('user');
     const categorie = client.db('asfall9').collection('category');
 
-    const verifyAdmin = async(req, res, next ) =>{
+    const verifyAdmin = async (req, res, next) => {
       const decodedEmail = req.decoded.email;
-      const query = {email: decodedEmail};
+      const query = { email: decodedEmail };
       const user = await usersCollection.findOne(query);
-      if(user?.
-        category !== 'admin'){
-        return res.status(403).send({message: 'forbidden access'})
+      if (user?.
+        category !== 'admin') {
+        return res.status(403).send({ message: 'forbidden access' })
       }
       next();
     }
@@ -77,9 +77,19 @@ async function run() {
         query = { email: req.query.email }
 
       }
+      query = {}
       const userData = await carsCollection.find(query).toArray();
       res.send(userData);
     })
+
+        // get product using category
+        app.get('/categories/:id', async (req, res) => {
+          const id = req.params.id;
+          const query = { status: `${id}` };
+          const cursor = carsCollection.find(query);
+          const cars = await cursor.toArray();
+          res.send(cars);
+        });
 
 
     app.post('/carsdata', async (req, res) => {
@@ -191,10 +201,10 @@ async function run() {
       res.send(orders);
     })
 
-    app.put('/users/admin/:id', async(req, res) =>{
+    app.put('/users/admin/:id', async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: ObjectId(id)}
-      const options = { upsert: true};
+      const filter = { _id: ObjectId(id) }
+      const options = { upsert: true };
       const upData = {
         $set: {
           category: 'admin'
@@ -204,11 +214,32 @@ async function run() {
       res.send(result);
     })
 
-    
-    app.put('/users/:id', async(req, res) =>{
+    app.get('/users/seller/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email }
+      const user = await userCollection.findOne(query);
+      res.send(user);
+    })
+
+    app.get('/users/buyer/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email }
+      const user = await userCollection.findOne(query);
+      res.send(user);
+    })
+
+    app.get('/users/admin/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email }
+      const user = await userCollection.findOne(query);
+      res.send(user);
+    })
+
+
+    app.put('/users/:id', async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: ObjectId(id)}
-      const options = { upsert: true};
+      const filter = { _id: ObjectId(id) }
+      const options = { upsert: true };
       const upData = {
         $set: {
           status: 'verified'
@@ -234,4 +265,3 @@ app.get('/', async (req, res) => {
 })
 
 app.listen(port, () => console.log(`as-fall running on ${port}`))
-
