@@ -48,7 +48,8 @@ async function run() {
       const decodedEmail = req.decoded.email;
       const query = {email: decodedEmail};
       const user = await usersCollection.findOne(query);
-      if(user?.role !== 'admin'){
+      if(user?.
+        category !== 'admin'){
         return res.status(403).send({message: 'forbidden access'})
       }
       next();
@@ -190,17 +191,19 @@ async function run() {
       res.send(orders);
     })
 
-    // get user by email
-    app.get('/users/admin/:email', async (req, res) => {
-      const email = req.params.email;
-      const query = { email }
-      const user = await userCollection.findOne(query);
-      res.send(user);
+    app.put('/users/admin/:id', async(req, res) =>{
+      const id = req.params.id;
+      const filter = {_id: ObjectId(id)}
+      const options = { upsert: true};
+      const upData = {
+        $set: {
+          category: 'admin'
+        }
+      }
+      const result = await userCollection.updateOne(filter, upData, options);
+      res.send(result);
     })
 
-    app.delete('/carsdata/:id', async (req, res) => {
-      const id = req.params.id;
-    })
 
 
   }
